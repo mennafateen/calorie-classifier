@@ -4,7 +4,6 @@ import numpy
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
-from keras.layers.embeddings import Embedding
 from keras.preprocessing import sequence
 
 
@@ -16,8 +15,6 @@ for line in lines:
 
 gmodel = gensim.models.Word2Vec(words, size=32, window=5, min_count=1, workers=4)
 
-print ("vector len: " , gmodel['الماء'].__len__())
-print (gmodel['كوب'].__len__())
 x_train = []
 x_test = []
 c = 0
@@ -45,22 +42,20 @@ for line in ylines:
         y_test.append(int(line))
     c += 1
 
-train = (x_train, y_train)
-test = (x_test, y_test)
 
 max_review_length = 200
-x_train = sequence.pad_sequences(x_train, maxlen=max_review_length)
+x_train = sequence.pad_sequences(x_train, maxlen=max_review_length) # pad sentences with zeros if less than 200 and truncate longer
 x_test = sequence.pad_sequences(x_test, maxlen=max_review_length)
 
-print (x_train.__len__())
 
 model = Sequential()
-model.add(Dense(101, input_shape=(200,32)))
-model.add(LSTM(100))
-model.add(Dense(1, activation='sigmoid'))
+model.add(Dense(100, input_shape=(200,32))) # specifiying input shape (first param is op of layer)
+model.add(LSTM(100)) # lstm rnn w 100 memory units
+model.add(Dense(1, activation='sigmoid'))  # output layer - (classification)
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 print(model.summary())
-model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=3, batch_size=64)
+model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=2, batch_size=64)
+# modifying epochs affects accurary, understand...
 
 scores = model.evaluate(x_test, y_test, verbose=0)
 print("Accuracy: %.2f%%" % (scores[1]*100))
