@@ -6,6 +6,7 @@ from keras.layers import Dense
 from keras.layers import LSTM
 from keras.preprocessing import sequence
 
+numpy.random.seed(5)
 
 file = open('input.txt', encoding='utf-8').read()
 lines = file.split('\n')
