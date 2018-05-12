@@ -6,7 +6,8 @@ from keras.layers import Dense
 from keras.layers import LSTM
 from keras.preprocessing import sequence
 
-numpy.random.seed(5)
+from keras import backend as K
+
 
 file = open('input.txt', encoding='utf-8').read()
 lines = file.split('\n')
@@ -60,4 +61,18 @@ model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=2, batch_si
 
 scores = model.evaluate(x_test, y_test, verbose=0)
 print("Accuracy: %.2f%%" % (scores[1]*100))
+
+# one way i found to print the testing result, but i doubted it
+print(model.predict(x_test))
+
+# searched for another one, got the same result
+lstm_out = K.function([model.inputs[0],
+                        K.learning_phase()],
+                       [model.layers[2].output])
+
+# pass in the input and set the the learning phase to 0
+print(lstm_out([x_test, 0])[0])
+
+# floats 
+
 
